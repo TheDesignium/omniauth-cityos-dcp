@@ -1,0 +1,6 @@
+AllCops:
+    NewCops: enable
+
+Naming/FileName:
+  Exclude:
+    - 'lib/aict_cityos/cityos_dcp_login.rb'
