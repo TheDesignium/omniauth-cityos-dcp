@@ -15,9 +15,7 @@ module OmniAuth
             {
                 nickname: raw_info["nickname"],
                 email: raw_info["user_email"],
-                name: raw_info["nickname"],
-                first_name: raw_info["user_last_name"],
-                last_name: raw_info["user_first_name"]
+                name: raw_info["nickname"]
             }
         end
 
@@ -79,13 +77,9 @@ module OmniAuth
                                              },
                                              body: {
                                                 retrieveItem: {
-                                                    countryCode: "1",
                                                     userId: "1",
                                                     nickname: "1",
                                                     userEmail: "1",
-                                                    userProfileImg: "1",
-                                                    userLastName: "1",
-                                                    userFirstName: "1",
                                                 }
                                              }.to_json
                                             ).parsed
