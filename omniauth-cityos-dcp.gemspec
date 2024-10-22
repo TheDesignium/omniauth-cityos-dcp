@@ -38,4 +38,8 @@ Gem::Specification.new do |spec|
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html
   spec.metadata['rubygems_mfa_required'] = 'true'
+
+  # decidimのバージョンを27系のみとする
+  spec.add_dependency "decidim", ">= 0.27.0", "< 0.28.0"
+
 end
