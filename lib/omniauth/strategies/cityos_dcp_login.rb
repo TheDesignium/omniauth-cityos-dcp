@@ -93,7 +93,7 @@ module OmniAuth
         end
 
         def agreement_callback_url
-            full_host + "/users/sign_in?locale=ja"
+            full_host + "/users/sign_in"
         end
 
         def code_verifier
