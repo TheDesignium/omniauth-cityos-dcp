@@ -13,7 +13,7 @@
           <% begin %>
             <%= oauth_icon provider if respond_to?(:oauth_icon) %>
           <% rescue StandardError => e %>
-            <%= logger.debug "OAuth icon error for #{provider}: #{e.message}" %>
+            <%- logger.debug "OAuth icon error for #{provider}: #{e.message}" %>
           <% end %>
           <span>
             <%= normalize_provider_name(provider).titleize %>
