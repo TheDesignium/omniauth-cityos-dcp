@@ -10,7 +10,11 @@
             <%= t("devise.shared.links.log_in_with_provider", provider: current_organization.enabled_omniauth_providers[provider][labelField]) %>
           </span>
         <%- else %>
-          <%= oauth_icon provider %>
+          <% begin %>
+            <%= oauth_icon provider if respond_to?(:oauth_icon) %>
+          <% rescue StandardError => e %>
+            <%= logger.debug "OAuth icon error for #{provider}: #{e.message}" %>
+          <% end %>
           <span>
             <%= normalize_provider_name(provider).titleize %>
           </span>
