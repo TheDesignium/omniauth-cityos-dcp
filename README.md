@@ -2,13 +2,6 @@
 公開用の都市OSのomniauthライブラリ
 Code For Japan 版のDecidimを想定しているので、他のRoRに適応されるかは未知数
 
-
-# OmniAuth::LineLogin
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/omniauth/line_login`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
@@ -41,4 +34,4 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/takahashim/omniauth-line_login.
+Bug reports and pull requests are welcome on GitHub at https://github.com/TheDesignium/omniauth-cityos-dcp
