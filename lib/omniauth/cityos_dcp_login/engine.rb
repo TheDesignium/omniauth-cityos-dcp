@@ -52,6 +52,18 @@ module OmniAuth
         end
       end
 
+      # **アイコン登録**
+      initializer 'omniauth.cityos_dcp_login.register_icons' do
+        ActiveSupport.on_load(:after_initialize) do
+          if defined?(Decidim.icons)
+            Decidim.icons.register(name: "facebook", icon: "facebook-fill", category: "system", description: "", engine: :core)
+            Decidim.icons.register(name: "x", icon: "x-fill", category: "system", description: "", engine: :core)
+            Decidim.icons.register(name: "google", icon: "google-fill", category: "system", description: "", engine: :core)
+          else
+            Rails.logger.warn "Decidim.icons is not defined. Unable to register custom icons."
+          end
+        end
+      end
 
       # Require the strategy
       require_relative '../strategies/cityos_dcp_login'
