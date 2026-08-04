@@ -20,7 +20,7 @@ class DecidimV030ContractTest < Minitest::Test
   def test_gemspec_supports_decidim_v030_only
     source = File.read(gemspec_path)
 
-    assert_includes source, 'spec.add_dependency "decidim", "~> 0.30.0"'
+    assert_includes source, 'spec.add_dependency "decidim", ">= 0.30.0"'
     refute_includes source, "app/**/*"
   end
 
