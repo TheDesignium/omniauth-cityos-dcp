@@ -39,6 +39,4 @@ Gem::Specification.new do |spec|
   # guide at: https://bundler.io/guides/creating_gem.html
   spec.metadata['rubygems_mfa_required'] = 'true'
 
-  spec.add_dependency "decidim", ">= 0.30.0"
-
 end

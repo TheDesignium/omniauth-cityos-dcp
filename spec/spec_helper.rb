@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'omniauth/cityos_dcp_login'
+require 'omniauth-cityos-dcp'
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
