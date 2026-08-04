@@ -8,6 +8,7 @@ RSpec.describe OmniAuth::Strategies::CityosDcpLogin do
       client_secret: "client-secret",
       policy: "policy",
       optin_url: "https://login.example.com/opt-in",
+      opt_api_base_url: "api.example.com",
       authorization_url: "login.example.com",
       scope: "openid"
     )
@@ -40,5 +41,30 @@ RSpec.describe OmniAuth::Strategies::CityosDcpLogin do
     strategy.options.cookie_store = false
 
     expect(strategy.send(:cookie_store?)).to be(false)
+  end
+
+  it "requests only the CityOS profile fields used by the auth hash" do
+    payload = double("payload", agreeFlg: "1")
+    response = double("response", parsed: payload)
+    access_token = double("access token", token: "secret-token")
+    client = double("client")
+
+    allow(strategy).to receive(:access_token).and_return(access_token)
+    allow(strategy).to receive(:client).and_return(client)
+    allow(strategy).to receive(:session).and_return({})
+    expect(client).to receive(:request).with(
+      :post,
+      "https://api.example.com/api/v2/users/retrieve",
+      hash_including(
+        body: {
+          retrieveItem: {
+            userId: "1",
+            nickname: "1"
+          }
+        }.to_json
+      )
+    ).and_return(response)
+
+    expect(strategy.send(:user_info_opt)).to eq(payload)
   end
 end

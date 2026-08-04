@@ -107,7 +107,6 @@ module OmniAuth
                                                 retrieveItem: {
                                                     userId: "1",
                                                     nickname: "1",
-                                                    userEmail: "1",
                                                 }
                                              }.to_json
                                             ).parsed
