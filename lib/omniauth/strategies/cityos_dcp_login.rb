@@ -8,6 +8,7 @@ module OmniAuth
 
         option state: SecureRandom.hex(24)
         option :pkce, true
+        option :cookie_store, true
 
         SRF_GUARD_COOKIE_NAME = 'xsrf_guard'.freeze
 
@@ -29,10 +30,7 @@ module OmniAuth
         end
 
         def callback_phase
-
-            if cookie_store?
-                super
-            end
+            return oauth2_callback_phase if cookie_store?
 
             error = request.params["error_reason"] || request.params["error"]
 
@@ -40,7 +38,7 @@ module OmniAuth
             if error
                 fail!(error, CallbackError.new(request.params["error"], request.params["error_description"] || request.params["error_reason"], request.params["error_uri"]))
             elsif request.params['code']
-                super
+                oauth2_callback_phase
             elsif request.cookies[SRF_GUARD_COOKIE_NAME] && session[:csrf_guard]
 
                 # オプトインフローでのCSRFチェック
@@ -124,7 +122,6 @@ module OmniAuth
                 agreement_url = "https://#{options.optin_url}?serviceId=#{options.service_id}&redirectUrl=#{CGI.escape(redirect_url)}"
                 raise AgreementRequiredError, agreement_url
             else
-                Rails.logger.info("token:#{@id_token_payload.inspect}")
                 @id_token_payload
             end
         end
@@ -157,7 +154,6 @@ module OmniAuth
                 # オプトイン承認後に必要な処理を行う
                 request.params['state'] = csrf_token
                 session['omniauth.state'] = csrf_token
-                Rails.logger.debug "Current sessions: #{session.to_hash.inspect}"
                 self.access_token = build_access_token_class session["access_token"]
             end
         end
@@ -167,12 +163,9 @@ module OmniAuth
 
             # URIからパスを抽出
             begin
-                parsed_uri = URI(uri)
-                path = parsed_uri.path.empty? ? '/' : parsed_uri.path
-                domain = extract_domain(parsed_uri.host)
+                URI(uri)
               rescue URI::InvalidURIError
                 # 無効なURIの場合のエラー処理
-                Rails.logger.error "Invalid URI provided: #{uri}"
                 raise ArgumentError, "Invalid URI provided: #{uri}"
               end
 
@@ -182,14 +175,11 @@ module OmniAuth
 
             r.set_cookie(SRF_GUARD_COOKIE_NAME, {
                 value: csrf_token,
-                expires: 5.minutes.from_now,
+                expires: Time.now + 300,
                 secure: true,
                 http_only: true,
                 same_site: :none  # クロスサイトリクエストを許可する場合
             })
-
-            Rails.logger.debug "Cookies after setting:"
-            Rails.logger.debug r.headers["Set-Cookie"]
 
             if options[:iframe]
                 r.write("<script type='text/javascript' charset='utf-8'>top.location.href = '#{uri.to_json}';</script>")
@@ -199,16 +189,6 @@ module OmniAuth
             end
 
             r.finish
-        end
-
-        def extract_domain(host)
-            return nil if host.nil?
-
-            parts = host.split('.')
-            return host if parts.length <= 2
-
-            # サブドメインを除去し、メインドメインとTLDを返す
-            parts.slice(-2, 2).join('.')
         end
 
         def build_access_token_class(existing_token)
@@ -222,7 +202,7 @@ module OmniAuth
             # 正規表現パターン: 文字、数字、'-' および '_' のみを許可
             valid_pattern = /^[a-zA-Z0-9\-_]+$/
 
-            if nickname.present? && nickname.match?(valid_pattern)
+            if !nickname.to_s.empty? && nickname.match?(valid_pattern)
               nickname
             else
               # ランダムな8文字の英数字を生成
@@ -230,23 +210,12 @@ module OmniAuth
             end
         end
 
-        def detect_session_store
-            return false unless defined?(Rails)
-            return false unless Rails.application
-            
-            begin
-              store = Rails.application.config.session_store
-              return store if store
-              false
-            rescue
-              false
-            end
+        def oauth2_callback_phase
+            OmniAuth::Strategies::OAuth2.instance_method(:callback_phase).bind(self).call
         end
-          
+
         def cookie_store?
-            store = detect_session_store
-            return true unless store  # セッションが検出できない場合はcookie扱い
-            store.to_s.include?('CookieStore')
+            options.cookie_store != false
         end
     end
     end
